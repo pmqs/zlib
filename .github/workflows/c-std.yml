@@ -47,10 +47,10 @@ jobs:
 
     - name: Generate project files
       run: |
-        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release 
+        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std }} -Werror -D ZLIB_BUILD_EXAMPLES=off
+        CFLAGS: -std=${{ matrix.std }} -Werror 
 
     - name: Compile source code
       run: cmake --build . --config Release
