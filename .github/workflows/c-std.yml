@@ -19,7 +19,11 @@ jobs:
         compiler:
           - gcc
           - clang
-
+          
+        builder:
+          - configure
+          - cmake
+          
         std:
           - c89
           - gnu89
@@ -45,17 +49,38 @@ jobs:
     #   run: |
     #     sudo apt-get update
 
-    - name: Generate project files
+    - name: Generate project files (configure)
+      if: matrix.builder == 'configure'
+      run: |
+        ./configure ${{ matrix.configure-args }}
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: -std=${{ matrix.std }} -Werror
+
+    - name: Compile source code (configure)
+      if: matrix.builder == 'configure'
+      run: make -j2
+
+    - name: Run test cases (configure)
+      if: matrix.builder == 'configure'
+      run: |
+        make test
+        make cover
+
+    - name: Generate project files (cmake)
+      if: matrix.builder == 'cmake'
       run: |
         cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
       env:
         CC: ${{ matrix.compiler }}
         CFLAGS: -std=${{ matrix.std }} -Werror 
 
-    - name: Compile source code
+    - name: Compile source code (cmake)
+      if: matrix.builder == 'cmake'
       run: cmake --build . --config Release
 
-    - name: Run test cases
+    - name: Run test cases (cmake)
+      if: matrix.builder == 'cmake'
       run: ctest -C Release --output-on-failure --max-width 120
 
     # - name: Upload build errors
