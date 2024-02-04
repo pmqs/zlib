@@ -1,0 +1,68 @@
+name: Linux
+
+# Set to manual execution only for now.
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  configure:
+    name: ${{ matrix.compiler }} -std=${{ matrix.std }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+
+        compiler:
+          - gcc
+          - clang
+
+        std:
+          - c89
+          - gnu89
+          - iso9899:199409
+          - c99
+          - gnu99
+          - c11
+          - gnu11
+          - c17
+          - gnu17
+          - c2x
+          - gnu2x
+
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        show-progress: 'false'
+
+    # - name: Install packages (Ubuntu)
+    #   run: |
+    #     sudo apt-get update
+
+    - name: Generate project files
+      run: |
+        cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: -std=${{ matrix.std }} -Werror
+
+    - name: Compile source code
+      run: cmake --build . --config Release
+
+    - name: Run test cases
+      run: ctest -C Release --output-on-failure --max-width 120
+
+    # - name: Upload build errors
+    #   uses: actions/upload-artifact@v3
+    #   if: failure()
+    #   with:
+    #     name: ${{ matrix.name }} (configure)
+    #     path: |
+    #       ${{ matrix.build-dir || '.' }}/configure.log
+    #     retention-days: 7
