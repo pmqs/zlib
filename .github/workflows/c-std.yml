@@ -1,4 +1,4 @@
-name: Linux
+name: C Standard
 
 # Set to manual execution only for now.
 on:
@@ -47,7 +47,7 @@ jobs:
 
     - name: Generate project files
       run: |
-        cmake -S . -B . -G Ninja -D CMAKE_BUILD_TYPE=Release
+        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release
       env:
         CC: ${{ matrix.compiler }}
         CFLAGS: -std=${{ matrix.std }} -Werror
