@@ -19,14 +19,15 @@ jobs:
         compiler:
           - gcc
           - clang
-          
+
         builder:
           - configure
           - cmake
-          
+
         std:
           - c89
           - gnu89
+          # c94 is iso9899:199409 for both gcc & clang
           - iso9899:199409
           - c99
           - gnu99
@@ -37,7 +38,6 @@ jobs:
           - c2x
           - gnu2x
 
-
     steps:
 
     - name: Checkout repository
@@ -45,14 +45,14 @@ jobs:
       with:
         show-progress: 'false'
 
-    # - name: Install packages (Ubuntu)
-    #   run: |
-    #     sudo apt-get update
+    - name: Install packages (Ubuntu)
+      run: |
+        sudo apt-get update
 
     - name: Generate project files (configure)
       if: matrix.builder == 'configure'
       run: |
-        ./configure ${{ matrix.configure-args }}
+        ./configure
       env:
         CC: ${{ matrix.compiler }}
         CFLAGS: -std=${{ matrix.std }} -Werror
@@ -73,7 +73,7 @@ jobs:
         cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std }} -Werror 
+        CFLAGS: -std=${{ matrix.std }} -Werror
 
     - name: Compile source code (cmake)
       if: matrix.builder == 'cmake'
@@ -83,11 +83,21 @@ jobs:
       if: matrix.builder == 'cmake'
       run: ctest -C Release --output-on-failure --max-width 120
 
-    # - name: Upload build errors
-    #   uses: actions/upload-artifact@v3
-    #   if: failure()
-    #   with:
-    #     name: ${{ matrix.name }} (configure)
-    #     path: |
-    #       ${{ matrix.build-dir || '.' }}/configure.log
-    #     retention-days: 7
+    - name: Upload build errors
+      uses: actions/upload-artifact@v3
+      if: failure() && matrix.builder == 'configure'
+      with:
+        name: ${{ matrix.compiler }} ${{ matrix.std }} (configure)
+        path: |
+          ./configure.log
+        retention-days: 7
+
+    - name: Upload build errors
+      uses: actions/upload-artifact@v3
+      if: failure() && matrix.builder == 'cmake'
+      with:
+        name: ${{ matrix.compiler }} ${{ matrix.std }} (cmake)
+        path: |
+          **/CMakeFiles/CMakeOutput.log
+          **/CMakeFiles/CMakeError.log
+        retention-days: 7
