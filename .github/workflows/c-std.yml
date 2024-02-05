@@ -1,6 +1,5 @@
 name: C Standard
 
-# Set to manual execution only for now.
 on:
   workflow_dispatch:
   push:
