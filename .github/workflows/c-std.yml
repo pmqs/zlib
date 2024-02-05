@@ -24,40 +24,19 @@ jobs:
           - configure
           - cmake
 
-        include:
-          - std: c89
-            cmd: c89
-
-          - std: gnu89
-            cmd: gnu89
-
-          - std: c94
-            cmd: iso9899:199409
-
-          - std: c99
-            cmd: c99
-
-          - std: gnu99
-            cmd: gnu99
-
-          - std: c11
-            cmd: c11
-
-          - std: gnu11
-            cmd: gnu11
-
-          - std: c17
-            cmd: c17
-
-          - std: gnu17
-            cmd: gnu17
-
-          - std: c2x
-            cmd: c2x
-
-          - std: gnu2x
-            cmd: gnu2x
-
+        std:
+          - c89
+          - gnu89
+          # c94 is iso9899:199409 for both gcc & clang
+          - iso9899:199409
+          - c99
+          - gnu99
+          - c11
+          - gnu11
+          - c17
+          - gnu17
+          - c2x
+          - gnu2x
 
     steps:
 
@@ -76,7 +55,7 @@ jobs:
         ./configure
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.cmd }} -Werror
+        CFLAGS: -std=${{ matrix.std }} -Werror
 
     - name: Compile source code (configure)
       if: matrix.builder == 'configure'
@@ -94,7 +73,7 @@ jobs:
         cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.cmd }} -Werror
+        CFLAGS: -std=${{ matrix.std }} -Werror
 
     - name: Compile source code (cmake)
       if: matrix.builder == 'cmake'
