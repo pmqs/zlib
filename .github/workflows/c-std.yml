@@ -46,6 +46,7 @@ jobs:
         show-progress: 'false'
 
     - name: Install packages (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
 
