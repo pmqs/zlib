@@ -24,19 +24,40 @@ jobs:
           - configure
           - cmake
 
-        std:
-          - c89
-          - gnu89
-          # c94 is iso9899:199409 for both gcc & clang
-          - iso9899:199409
-          - c99
-          - gnu99
-          - c11
-          - gnu11
-          - c17
-          - gnu17
-          - c2x
-          - gnu2x
+        include:
+          - std: c89
+            cmd: c89
+
+          - std: gnu89
+            cmd: gnu89
+
+          - std: c94
+            cmd: iso9899:199409
+
+          - std: c99
+            cmd: c99
+
+          - std: gnu99
+            cmd: gnu99
+
+          - std: c11
+            cmd: c11
+
+          - std: gnu11
+            cmd: gnu11
+
+          - std: c17
+            cmd: c17
+
+          - std: gnu17
+            cmd: gnu17
+
+          - std: c2x
+            cmd: c2x
+
+          - std: gnu2x
+            cmd: gnu2x
+
 
     steps:
 
@@ -55,7 +76,7 @@ jobs:
         ./configure
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std }} -Werror
+        CFLAGS: -std=${{ matrix.cmd }} -Werror
 
     - name: Compile source code (configure)
       if: matrix.builder == 'configure'
@@ -73,7 +94,7 @@ jobs:
         cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std }} -Werror
+        CFLAGS: -std=${{ matrix.cmd }} -Werror
 
     - name: Compile source code (cmake)
       if: matrix.builder == 'cmake'
@@ -83,21 +104,23 @@ jobs:
       if: matrix.builder == 'cmake'
       run: ctest -C Release --output-on-failure --max-width 120
 
-    - name: Upload build errors
-      uses: actions/upload-artifact@v3
+    - name: Upload build errors (configure)
+      uses: actions/upload-artifact@v4
       if: failure() && matrix.builder == 'configure'
       with:
         name: ${{ matrix.compiler }} ${{ matrix.std }} (configure)
         path: |
           ./configure.log
+        if-no-files-found: ignore
         retention-days: 7
 
-    - name: Upload build errors
-      uses: actions/upload-artifact@v3
+    - name: Upload build errors (cmake)
+      uses: actions/upload-artifact@v4
       if: failure() && matrix.builder == 'cmake'
       with:
         name: ${{ matrix.compiler }} ${{ matrix.std }} (cmake)
         path: |
           **/CMakeFiles/CMakeOutput.log
           **/CMakeFiles/CMakeError.log
+        if-no-files-found: ignore
         retention-days: 7
