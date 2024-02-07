@@ -7,83 +7,99 @@ on:
 
 jobs:
 
-  # main:
-  #   name: ${{ matrix.os }} + ${{ matrix.compiler }} + ${{ matrix.builder }} -std=${{ matrix.std }}
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os:
-  #         - ubuntu-latest
-  #         - macos-latest
+  main:
+    name: ${{ matrix.os }} + ${{ matrix.compiler }} ${{ matrix.arch.name }} + ${{ matrix.builder }} -std=${{ matrix.std.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
 
-  #       compiler:
-  #         - gcc
-  #         - clang
+        compiler:
+          - gcc
+          - clang
 
-  #       builder:
-  #         - configure
-  #         - cmake
+        arch:
+        - name: 64-bit
+          value: -m64
+        - name: 32-bit
+          value: -m32
 
-  #       std:
-  #         - c89
-  #         - gnu89
-  #         # c94 is iso9899:199409 for both gcc & clang
-  #         - iso9899:199409
-  #         - c99
-  #         - gnu99
-  #         - c11
-  #         - gnu11
-  #         - c17
-  #         - gnu17
-  #         - c2x
-  #         - gnu2x
+        builder:
+          - configure
+          - cmake
 
-  #   steps:
+        std:
+          - name: c89
+            value: c89
+          - name: gnu89
+            value: gnu89
+          - name: c94
+            value: iso9899:199409
+          - name: c99
+            value: c99
+          - name: gnu99
+            value: gnu99
+          - name: c11
+            value: c11
+          - name: gnu11
+            value: gni11
+          - name: c17
+            value: c17
+          - name: gnu17
+            value: gnu17
+          - name: c2x
+            value: c2x
+          - name: gnu2x
+            value: gnu2x
 
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v4
-  #     with:
-  #       show-progress: 'false'
+    steps:
 
-  #   - name: Install packages (Ubuntu)
-  #     if: matrix.os == 'ubuntu-latest'
-  #     run: |
-  #       sudo apt-get update
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        show-progress: 'false'
 
-  #   - name: Generate project files (configure)
-  #     if: matrix.builder == 'configure'
-  #     run: |
-  #       ./configure
-  #     env:
-  #       CC: ${{ matrix.compiler }}
-  #       CFLAGS: -std=${{ matrix.std }} -Werror
+    - name: Install packages (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
 
-  #   - name: Compile source code (configure)
-  #     if: matrix.builder == 'configure'
-  #     run: make -j2
+    - name: Generate project files (configure)
+      if: matrix.builder == 'configure'
+      run: |
+        ./configure
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.value }} -Werror
 
-  #   - name: Run test cases (configure)
-  #     if: matrix.builder == 'configure'
-  #     run: |
-  #       make test
-  #       make cover
+    - name: Compile source code (configure)
+      if: matrix.builder == 'configure'
+      run: make -j2
 
-  #   - name: Generate project files (cmake)
-  #     if: matrix.builder == 'cmake'
-  #     run: |
-  #       cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
-  #     env:
-  #       CC: ${{ matrix.compiler }}
-  #       CFLAGS: -std=${{ matrix.std }} -Werror
+    - name: Run test cases (configure)
+      if: matrix.builder == 'configure'
+      run: |
+        make test
+        make cover
 
-  #   - name: Compile source code (cmake)
-  #     if: matrix.builder == 'cmake'
-  #     run: cmake --build . --config Release
+    - name: Generate project files (cmake)
+      if: matrix.builder == 'cmake'
+      run: |
+        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.value }} -Werror
 
-  #   - name: Run test cases (cmake)
-  #     if: matrix.builder == 'cmake'
-  #     run: ctest -C Release --output-on-failure --max-width 120
+    - name: Compile source code (cmake)
+      if: matrix.builder == 'cmake'
+      run: cmake --build . --config Release
+
+    - name: Run test cases (cmake)
+      if: matrix.builder == 'cmake'
+      run: ctest -C Release --output-on-failure --max-width 120
 
 
   msvc:
