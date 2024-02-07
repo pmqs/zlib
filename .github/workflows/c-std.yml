@@ -66,10 +66,10 @@ jobs:
           #   value: gnu2x
 
 
-    # Only want the container for Linux
-    # 'if' not valid here, so use a ternary expression
-    container:
-      image: ${{ matrix.os.name == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
+    # # Only want the container for Linux
+    # # 'if' not valid here, so use a ternary expression
+    # container:
+    #   image: ${{ matrix.os.name == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
 
     steps:
 
@@ -78,10 +78,11 @@ jobs:
       with:
         show-progress: 'false'
 
-    - name: Install packages (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
+    - name: Install packages (Linux)
+      if: matrix.os.name == 'Linux' && matrix.compiler == 'gcc'
       run: |
         sudo apt-get update
+        sudo apt install gcc-multilib
 
     - name: Generate project files (configure)
       if: matrix.builder == 'configure'
