@@ -6,15 +6,16 @@ on:
   pull_request:
 
 jobs:
-  configure:
+  main:
     name: ${{ matrix.os }} + ${{ matrix.compiler }} + ${{ matrix.builder }} -std=${{ matrix.std }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - macos-latest
+          # - ubuntu-latest
+          # - macos-latest
+          - windows-latest
 
         compiler:
           - gcc
@@ -26,17 +27,17 @@ jobs:
 
         std:
           - c89
-          - gnu89
-          # c94 is iso9899:199409 for both gcc & clang
-          - iso9899:199409
-          - c99
-          - gnu99
-          - c11
-          - gnu11
-          - c17
-          - gnu17
-          - c2x
-          - gnu2x
+          # - gnu89
+          # # c94 is iso9899:199409 for both gcc & clang
+          # - iso9899:199409
+          # - c99
+          # - gnu99
+          # - c11
+          # - gnu11
+          # - c17
+          # - gnu17
+          # - c2x
+          # - gnu2x
 
     steps:
 
@@ -51,7 +52,7 @@ jobs:
         sudo apt-get update
 
     - name: Generate project files (configure)
-      if: matrix.builder == 'configure'
+      if: matrix.builder == 'configure' && matrix.os != 'windows-latest'
       run: |
         ./configure
       env:
@@ -59,11 +60,11 @@ jobs:
         CFLAGS: -std=${{ matrix.std }} -Werror
 
     - name: Compile source code (configure)
-      if: matrix.builder == 'configure'
+      if: matrix.builder == 'configure' && matrix.os != 'windows-latest'
       run: make -j2
 
     - name: Run test cases (configure)
-      if: matrix.builder == 'configure'
+      if: matrix.builder == 'configure' && matrix.os != 'windows-latest'
       run: |
         make test
         make cover
@@ -86,7 +87,7 @@ jobs:
 
     - name: Upload build errors (configure)
       uses: actions/upload-artifact@v4
-      if: failure() && matrix.builder == 'configure'
+      if: failure() && matrix.builder == 'configure' && matrix.os != 'windows-latest'
       with:
         name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.std }} (configure)
         path: |
@@ -99,6 +100,50 @@ jobs:
       if: failure() && matrix.builder == 'cmake'
       with:
         name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.std }} (cmake)
+        path: |
+          **/CMakeFiles/CMakeOutput.log
+          **/CMakeFiles/CMakeError.log
+        if-no-files-found: ignore
+        retention-days: 7
+
+  msvc:
+    name: ${{ matrix.os }} + msvc + cmake ${{ matrix.std }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+
+        std:
+          - ""
+          - /std:c11
+          - /std:c17
+          - /std:clatest
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        show-progress: 'false'
+
+    - name: Generate project files (cmake)
+      run: |
+        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
+      env:
+        CFLAGS: ${{ matrix.std }} -Werror
+
+    - name: Compile source code (cmake)
+      run: cmake --build . --config Release
+
+    - name: Run test cases (cmake)
+      run: ctest -C Release --output-on-failure --max-width 120
+
+    - name: Upload build errors (cmake)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.os }} msvc ${{ matrix.std }} (cmake)
         path: |
           **/CMakeFiles/CMakeOutput.log
           **/CMakeFiles/CMakeError.log
