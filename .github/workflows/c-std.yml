@@ -93,13 +93,19 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - windows-latest
+          - windows-2019
 
         cmake-args:
           # - name: 32-bit
           #   value: -A Win32
           - name: 64-bit
             value: -A x64
+
+        vsversion:
+          - 2010
+          - 2013
+          - 2019
+          - 2022
 
         std:
           # - name: default
@@ -118,9 +124,13 @@ jobs:
       with:
         show-progress: 'false'
 
-    # - name: Generate project files (cmake)
-    #   run: |
-    #     cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=cl  -D CMAKE_C_FLAGS="/WX ${{ matrix.std.value }}"
+    - name: Configure build for VS ${{ matrix.vsversion }}
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        vsversion: ${{ matrix.vsversion }}
+
+    - name: Compiler Version
+      run: cl
 
     - name: Generate project files (cmake)
       run: |
