@@ -85,29 +85,9 @@ jobs:
   #     if: matrix.builder == 'cmake'
   #     run: ctest -C Release --output-on-failure --max-width 120
 
-  #   - name: Upload build errors (configure)
-  #     uses: actions/upload-artifact@v4
-  #     if: failure() && matrix.builder == 'configure'
-  #     with:
-  #       name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.std }} (configure)
-  #       path: |
-  #         ./configure.log
-  #       if-no-files-found: ignore
-  #       retention-days: 7
-
-  #   - name: Upload build errors (cmake)
-  #     uses: actions/upload-artifact@v4
-  #     if: failure() && matrix.builder == 'cmake'
-  #     with:
-  #       name: ${{ matrix.os }} ${{ matrix.compiler }} ${{ matrix.std }} (cmake)
-  #       path: |
-  #         **/CMakeFiles/CMakeOutput.log
-  #         **/CMakeFiles/CMakeError.log
-  #       if-no-files-found: ignore
-  #       retention-days: 7
 
   msvc:
-    name: ${{ matrix.os }} + msvc + cmake ${{ matrix.std }}
+    name: ${{ matrix.os }} + msvc ${{ matrix.cmake-args.name }} ${{ matrix.std.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -116,14 +96,20 @@ jobs:
           - windows-latest
 
         cmake-args:
-          - -A Win32
-          - -A x64
+          - name: Win32
+            value: -A Win32
+          - name: Win86
+            value: -A x64
 
         std:
-          - ""
-          - /std:c11
-          - /std:c17
-          - /std:clatest
+          - name: default
+            value: ""
+          - name: C11
+            value: /std:c11
+          # - name: C17
+          #   value: /std:c17
+          # - name: latest
+          #   value: /std:clatest
 
     steps:
 
@@ -134,7 +120,7 @@ jobs:
 
     - name: Generate project files (cmake)
       run: |
-        cmake -S . -B . ${{ matrix.cmake-args }} -D CMAKE_BUILD_TYPE=Release 
+        cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: cl
         CFLAGS: ${{ matrix.std }} /WX
@@ -144,13 +130,3 @@ jobs:
 
     - name: Run test cases (cmake)
       run: ctest -C Release --output-on-failure --max-width 120
-
-    - name: Upload build errors (cmake)
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.os }} msvc ${{ matrix.std }} (cmake)
-        path: |
-          **/CMakeFiles/CMakeOutput.log
-          **/CMakeFiles/CMakeError.log
-        if-no-files-found: ignore
-        retention-days: 7
