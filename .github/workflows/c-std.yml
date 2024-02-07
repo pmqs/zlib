@@ -24,18 +24,13 @@ jobs:
           # - clang
 
         arch:
-          - name: 64-bit
-            tag: amd64
-            compiler-opt: -m64
+          # - name: 64-bit
+          #   tag: amd64
+          #   compiler-opt: -m64
           - name: 32-bit
             tag: i386
             compiler-opt: -m32
 
-        # arch:
-        # - name: 64-bit
-        #   value: -m64
-        # - name: 32-bit
-        #   value: -m32
 
         builder:
           - configure
@@ -44,26 +39,26 @@ jobs:
         std:
           - name: c89
             value: c89
-          # - name: gnu89
-          #   value: gnu89
-          # - name: c94
-          #   value: iso9899:199409
-          # - name: c99
-          #   value: c99
-          # - name: gnu99
-          #   value: gnu99
-          # - name: c11
-          #   value: c11
-          # - name: gnu11
-          #   value: gnu11
-          # - name: c17
-          #   value: c17
-          # - name: gnu17
-          #   value: gnu17
-          # - name: c2x
-          #   value: c2x
-          # - name: gnu2x
-          #   value: gnu2x
+          - name: gnu89
+            value: gnu89
+          - name: c94
+            value: iso9899:199409
+          - name: c99
+            value: c99
+          - name: gnu99
+            value: gnu99
+          - name: c11
+            value: c11
+          - name: gnu11
+            value: gnu11
+          - name: c17
+            value: c17
+          - name: gnu17
+            value: gnu17
+          - name: c2x
+            value: c2x
+          - name: gnu2x
+            value: gnu2x
 
 
     # # Only want the container for Linux
