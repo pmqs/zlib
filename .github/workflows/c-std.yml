@@ -69,7 +69,7 @@ jobs:
     # Only want the container for Linux
     # 'if' not valid here, so use a ternary expression
     container:
-      image: ${{ matrix.os.name == 'Linux' && join(matrix.arch.tag, '/debian/stable') || null }}
+      image: ${{ matrix.os.name == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
 
     steps:
 
