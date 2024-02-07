@@ -87,7 +87,7 @@ jobs:
 
 
   msvc:
-    name: ${{ matrix.os }} + msvc ${{ matrix.cmake-args.name }} ${{ matrix.std.name }}
+    name: ${{ matrix.os }} ${{ matrix.cmake-args.name }} + msvc  ${{ matrix.std.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -96,9 +96,9 @@ jobs:
           - windows-latest
 
         cmake-args:
-          - name: Win32
+          - name: 32-bit
             value: -A Win32
-          - name: Win86
+          - name: 64-bit
             value: -A x64
 
         std:
@@ -123,7 +123,7 @@ jobs:
         cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: cl
-        CFLAGS: ${{ matrix.std }} /WX
+        CFLAGS: ${{ matrix.std.value }} /WX
 
     - name: Compile source code (cmake)
       run: cmake --build . --config Release
