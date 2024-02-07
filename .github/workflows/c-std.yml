@@ -87,7 +87,7 @@ jobs:
 
 
   msvc:
-    name: ${{ matrix.os }} ${{ matrix.cmake-args.name }} + msvc  ${{ matrix.std.name }}
+    name: ${{ matrix.os }} ${{ matrix.cmake-args.name }} + msvc ${{ matrix.std.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -96,24 +96,18 @@ jobs:
           - windows-latest
 
         cmake-args:
-          # - name: 32-bit
-          #   value: -A Win32
+          - name: 32-bit
+            value: -A Win32
           - name: 64-bit
             value: -A x64
 
-        vsversion:
-          - 2010
-          - 2013
-          - 2019
-          - 2022
-
         std:
-          # - name: default
-          #   value: ""
-          # - name: C11
-          #   value: /std:c11
-          # - name: C17
-          #   value: /std:c17
+          - name: default
+            value: ""
+          - name: C11
+            value: /std:c11
+          - name: C17
+            value: /std:c17
           - name: latest
             value: /std:clatest
 
@@ -123,11 +117,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         show-progress: 'false'
-
-    - name: Configure build for VS ${{ matrix.vsversion }}
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        vsversion: ${{ matrix.vsversion }}
 
     - name: Compiler Version
       run: cl
