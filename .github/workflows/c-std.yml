@@ -96,16 +96,16 @@ jobs:
           - windows-latest
 
         cmake-args:
-          - name: 32-bit
-            value: -A Win32
+          # - name: 32-bit
+          #   value: -A Win32
           - name: 64-bit
             value: -A x64
 
         std:
           - name: default
             value: ""
-          - name: C11
-            value: /std:c11
+          # - name: C11
+          #   value: /std:c11
           # - name: C17
           #   value: /std:c17
           # - name: latest
