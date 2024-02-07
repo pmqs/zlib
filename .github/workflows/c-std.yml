@@ -37,8 +37,8 @@ jobs:
           # - cmake
 
         std:
-          # - name: c89
-          #   value: c89
+          - name: c89
+            value: c89
           # - name: gnu89
           #   value: gnu89
           # - name: c94
