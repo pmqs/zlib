@@ -499,8 +499,6 @@ int main(int argc, char *argv[]) {
     gzFile file;
     char *bname, outmode[5];
 
-    char fred = 1234;
-
     string_copy(outmode, "wb6 ", sizeof(outmode));
     prog = argv[0];
     bname = strrchr(argv[0], '/');
