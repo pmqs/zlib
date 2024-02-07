@@ -14,14 +14,14 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # - name: Linux
-          #   value: ubuntu-latest
-          - name: MacOS
-            value: macos-latest
+          - name: Linux
+            value: ubuntu-latest
+          # - name: MacOS
+          #   value: macos-latest
 
         compiler:
-          - gcc
-          # - clang
+          # - gcc
+          - clang
 
         arch:
           - name: 64-bit
