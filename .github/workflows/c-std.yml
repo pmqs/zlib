@@ -118,16 +118,12 @@ jobs:
       with:
         show-progress: 'false'
 
-    - name: Compiler Version
-      run: cl
-
     - name: Generate project files (cmake)
       run: |
         cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: cl
         CFLAGS: /WX ${{ matrix.std.value }}
-
 
     - name: Compile source code (cmake)
       run: cmake --build . --config Release -v
