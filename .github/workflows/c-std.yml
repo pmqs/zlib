@@ -8,14 +8,16 @@ on:
 jobs:
 
   main:
-    name: ${{ matrix.os }} + ${{ matrix.compiler }} ${{ matrix.arch.name }} + ${{ matrix.builder }} -std=${{ matrix.std.name }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os.name }} + ${{ matrix.compiler }} ${{ matrix.arch.name }} + ${{ matrix.builder }} ${{ matrix.std.name }}
+    runs-on: ${{ matrix.os.value }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - macos-latest
+          - name: Linux
+            value: ubuntu-latest
+          - name: MacOS
+            value: macos-latest
 
         compiler:
           - gcc
@@ -103,15 +105,16 @@ jobs:
 
 
   msvc:
-    name: ${{ matrix.os }} ${{ matrix.cmake-args.name }} + msvc ${{ matrix.std.name }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os.name }} cl ${{ matrix.arch.name }}  ${{ matrix.std.name }}
+    runs-on: ${{ matrix.os.value }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - windows-latest
+          - name: Windows
+            value: windows-latest
 
-        cmake-args:
+        arch:
           - name: 32-bit
             value: -A Win32
           - name: 64-bit
@@ -136,7 +139,7 @@ jobs:
 
     - name: Generate project files (cmake)
       run: |
-        cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release
+        cmake -S . -B . ${{ matrix.arch.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: cl
         CFLAGS: /WX ${{ matrix.std.value }}
