@@ -118,13 +118,17 @@ jobs:
       with:
         show-progress: 'false'
 
+    # - name: Generate project files (cmake)
+    #   run: |
+    #     cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=cl  -D CMAKE_C_FLAGS="/WX ${{ matrix.std.value }}"
+
     - name: Generate project files (cmake)
       run: |
-        cmake -S . -B . \
-          ${{ matrix.cmake-args.value }} \
-          -D CMAKE_BUILD_TYPE=Release \
-          -D CMAKE_C_COMPILER=cl \
-          -D CMAKE_C_FLAGS="/WX ${{ matrix.std.value }}"
+        cmake -S . -B . ${{ matrix.cmake-args.value }} -D CMAKE_BUILD_TYPE=Release
+      env:
+        CC: cl
+        CFLAGS: /WX ${{ matrix.std.value }}
+
 
     - name: Compile source code (cmake)
       run: cmake --build . --config Release -v
