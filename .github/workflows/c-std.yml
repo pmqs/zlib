@@ -115,6 +115,10 @@ jobs:
         os:
           - windows-latest
 
+        cmake-args:
+          - -A Win32
+          - -A x64
+
         std:
           - ""
           - /std:c11
@@ -130,8 +134,9 @@ jobs:
 
     - name: Generate project files (cmake)
       run: |
-        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
+        cmake -S . -B . ${{ matrix.cmake-args }} -D CMAKE_BUILD_TYPE=Release 
       env:
+        CC: cl
         CFLAGS: ${{ matrix.std }} /WX
 
     - name: Compile source code (cmake)
