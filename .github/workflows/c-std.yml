@@ -20,7 +20,7 @@ jobs:
           #   value: macos-latest
 
         compiler:
-          # - gcc
+          - gcc
           - clang
 
         arch:
@@ -74,10 +74,10 @@ jobs:
         show-progress: 'false'
 
     - name: Install packages (Linux)
-      if: matrix.os.name == 'Linux' && matrix.compiler == 'gcc'
+      if: matrix.os.name == 'Linux' && matrix.arch.tag == 'i386'
       run: |
         sudo apt-get update
-        sudo apt install gcc-multilib
+        sudo apt install gcc-multilib libc6-dev-i386-cross
 
     - name: Generate project files (configure)
       if: matrix.builder == 'configure'
