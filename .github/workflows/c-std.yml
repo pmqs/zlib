@@ -62,8 +62,8 @@ jobs:
 
         # Don't run 32-bit on MacOS
         exclude:
-          - { os:   { name: MacOS } }
-            { arch: { tag:  i386  } }
+          - { os:   { name: MacOS },
+              arch: { tag:  i386  } }
 
     # # Only want the container for Linux
     # # 'if' not valid here, so use a ternary expression
