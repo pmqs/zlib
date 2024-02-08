@@ -20,6 +20,7 @@ jobs:
           #   value: macos-latest
           - name: Windows
             value: windows-latest
+            # cmake-opt: -G Ninja
 
         compiler:
           - gcc
@@ -29,9 +30,12 @@ jobs:
           - name: 64-bit
             tag: amd64
             compiler-opt: -m64
+            cmake-opt: -A x64
+            
           - name: 32-bit
             tag: i386
             compiler-opt: -m32
+            cmake-opt: -A Win32
 
 
         builder:
@@ -114,7 +118,7 @@ jobs:
     - name: Generate project files (cmake)
       if: matrix.builder == 'cmake'
       run: |
-        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF
+        cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF ${{ matrix.arch.cmake-opt }}
       env:
         CC: ${{ matrix.compiler }}
         CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.compiler-opt }} -Werror
