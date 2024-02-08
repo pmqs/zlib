@@ -14,10 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - name: Linux
-            value: ubuntu-latest
-          - name: MacOS
-            value: macos-latest
+          # - name: Linux
+          #   value: ubuntu-latest
+          # - name: MacOS
+          #   value: macos-latest
+          - name: Windows
+            value: windows-latest
 
         compiler:
           - gcc
@@ -60,10 +62,18 @@ jobs:
           # - name: gnu2x
           #   value: gnu2x
 
-        # Don't run 32-bit on MacOS
         exclude:
+            # Don't run 32-bit on MacOS
           - { os:   { name: MacOS },
               arch: { tag:  i386  } }
+
+            # Don't run configure on Windows
+          - { os:   { name: Windows },
+              builder: configure }
+
+          #   # Don't run clang on Windows
+          # - { os:   { name: Windows },
+          #     compiler: clang }
 
     # # Only want the container for Linux
     # # 'if' not valid here, so use a ternary expression
