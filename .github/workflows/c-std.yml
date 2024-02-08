@@ -62,7 +62,7 @@ jobs:
 
         # Don't run 32-bit on MacOS
         exclude:
-          - natrix.os.name: MacOS
+          - matrix.os.name: MacOS
             matrix.arch.tag: i386
 
     # # Only want the container for Linux
