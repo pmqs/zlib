@@ -1,5 +1,8 @@
 name: C Standard
 
+# Compile with as many C standars as possible.
+# The worflow is setup to fail on any compilation warnings.
+
 on:
   workflow_dispatch:
   push:
@@ -8,16 +11,18 @@ on:
 jobs:
 
   main:
-    name: ${{ matrix.os.name }} + ${{ matrix.compiler }} ${{ matrix.arch.name }} + ${{ matrix.builder }} ${{ matrix.std.name }}
+    name: ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.arch.name }} ${{ matrix.std.name }}  ${{ matrix.builder }}
     runs-on: ${{ matrix.os.value }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          # - name: Linux
-          #   value: ubuntu-latest
-          # - name: MacOS
-          #   value: macos-latest
+          - name: Linux
+            value: ubuntu-latest
+
+          - name: MacOS
+            value: macos-latest
+
           - name: Windows
             value: windows-latest
             cmake-opt: -G Ninja
@@ -45,26 +50,36 @@ jobs:
         std:
           - name: c89
             value: c89
-          # - name: gnu89
-          #   value: gnu89
-          # - name: c94
-          #   value: iso9899:199409
-          # - name: c99
-          #   value: c99
-          # - name: gnu99
-          #   value: gnu99
-          # - name: c11
-          #   value: c11
-          # - name: gnu11
-          #   value: gnu11
-          # - name: c17
-          #   value: c17
-          # - name: gnu17
-          #   value: gnu17
-          # - name: c2x
-          #   value: c2x
-          # - name: gnu2x
-          #   value: gnu2x
+
+          - name: gnu89
+            value: gnu89
+
+          - name: c94
+            value: iso9899:199409
+
+          - name: c99
+            value: c99
+
+          - name: gnu99
+            value: gnu99
+
+          - name: c11
+            value: c11
+
+          - name: gnu11
+            value: gnu11
+
+          - name: c17
+            value: c17
+
+          - name: gnu17
+            value: gnu17
+
+          - name: c2x
+            value: c2x
+
+          - name: gnu2x
+            value: gnu2x
 
         exclude:
             # Don't run 32-bit on MacOS
@@ -76,17 +91,13 @@ jobs:
               builder: configure }
 
             # Don't run clang on Windows
+            # See https://github.com/madler/zlib/issues/932
           - { os:   { name: Windows },
               compiler: clang }
 
             # Don't run gcc 32-bit on Windows
           - { os:   { name: Windows },
               arch: { tag:  i386  } }
-
-    # # Only want the container for Linux
-    # # 'if' not valid here, so use a ternary expression
-    # container:
-    #   image: ${{ runner.os == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
 
     steps:
 
@@ -141,48 +152,58 @@ jobs:
       run: ctest -C Release --output-on-failure --max-width 120
 
 
-  # msvc:
-  #   name: ${{ matrix.os.name }} cl ${{ matrix.arch.name }}  ${{ matrix.std.name }}
-  #   runs-on: ${{ matrix.os.value }}
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os:
-  #         - name: Windows
-  #           value: windows-latest
+  msvc:
+    name: ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.arch.name }} ${{ matrix.std.name }}  ${{ matrix.builder }}
+    runs-on: ${{ matrix.os.value }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: Windows
+            value: windows-latest
 
-  #       arch:
-  #         - name: 32-bit
-  #           value: -A Win32
-  #         - name: 64-bit
-  #           value: -A x64
+        compiler:
+          - cl
 
-  #       std:
-  #         - name: default
-  #           value: ""
-  #         - name: C11
-  #           value: /std:c11
-  #         - name: C17
-  #           value: /std:c17
-  #         - name: latest
-  #           value: /std:clatest
+        arch:
+          - name: 32-bit
+            value: -A Win32
 
-  #   steps:
+          - name: 64-bit
+            value: -A x64
 
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v4
-  #     with:
-  #       show-progress: 'false'
+        builder:
+          - cmake
 
-  #   - name: Generate project files (cmake)
-  #     run: |
-  #       cmake -S . -B . ${{ matrix.arch.value }} -D CMAKE_BUILD_TYPE=Release
-  #     env:
-  #       CC: cl
-  #       CFLAGS: /WX ${{ matrix.std.value }}
+        std:
+          - name: default
+            value: ""
 
-  #   - name: Compile source code (cmake)
-  #     run: cmake --build . --config Release -v
+          - name: C11
+            value: /std:c11
 
-  #   - name: Run test cases (cmake)
-  #     run: ctest -C Release --output-on-failure --max-width 120
+          - name: C17
+            value: /std:c17
+
+          - name: latest
+            value: /std:clatest
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        show-progress: 'false'
+
+    - name: Generate project files (cmake)
+      run: |
+        cmake -S . -B . ${{ matrix.arch.value }} -D CMAKE_BUILD_TYPE=Release
+      env:
+        CC: ${{ matrix.compiler }}
+        CFLAGS: /WX ${{ matrix.std.value }}
+
+    - name: Compile source code (cmake)
+      run: cmake --build . --config Release -v
+
+    - name: Run test cases (cmake)
+      run: ctest -C Release --output-on-failure --max-width 120
