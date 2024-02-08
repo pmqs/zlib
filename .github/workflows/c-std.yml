@@ -75,9 +75,13 @@ jobs:
           - { os:   { name: Windows },
               builder: configure }
 
-          #   # Don't run clang on Windows
-          # - { os:   { name: Windows },
-          #     compiler: clang }
+            # Don't run clang on Windows
+          - { os:   { name: Windows },
+              compiler: clang }
+
+            # Don't run gcc 32-bit on Windows
+          - { os:   { name: Windows },
+              arch: { tag:  i386  } }
 
     # # Only want the container for Linux
     # # 'if' not valid here, so use a ternary expression
