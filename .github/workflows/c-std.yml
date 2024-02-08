@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # - name: Linux
-          #   value: ubuntu-latest
+          - name: Linux
+            value: ubuntu-latest
           - name: MacOS
             value: macos-latest
 
@@ -24,9 +24,9 @@ jobs:
           - clang
 
         arch:
-          # - name: 64-bit
-          #   tag: amd64
-          #   compiler-opt: -m64
+          - name: 64-bit
+            tag: amd64
+            compiler-opt: -m64
           - name: 32-bit
             tag: i386
             compiler-opt: -m32
@@ -57,9 +57,13 @@ jobs:
           #   value: gnu17
           # - name: c2x
           #   value: c2x
-          - name: gnu2x
-            value: gnu2x
+          # - name: gnu2x
+          #   value: gnu2x
 
+        # Don't run 32-bit on MacOS
+        exclude:
+          - os.name: MacOS
+            arch.tag: i386
 
     # # Only want the container for Linux
     # # 'if' not valid here, so use a ternary expression
