@@ -82,7 +82,7 @@ jobs:
     # # Only want the container for Linux
     # # 'if' not valid here, so use a ternary expression
     # container:
-    #   image: ${{ matrix.os.name == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
+    #   image: ${{ runner.os == 'Linux' && join(matrix.arch.tag, '/debian:stable') || null }}
 
     steps:
 
@@ -92,10 +92,15 @@ jobs:
         show-progress: 'false'
 
     - name: Install packages (Linux)
-      if: matrix.os.name == 'Linux' && matrix.arch.tag == 'i386'
+      if: runner.os == 'Linux' && matrix.arch.tag == 'i386'
       run: |
         sudo apt-get update
         sudo apt install gcc-multilib libc6-dev-i386-cross
+
+    - name: Install packages (Windows)
+      if: runner.os == 'Windows'
+      run: |
+          choco install --no-progress ninja
 
     - name: Generate project files (configure)
       if: matrix.builder == 'configure'
