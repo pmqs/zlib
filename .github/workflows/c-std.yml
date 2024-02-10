@@ -199,7 +199,7 @@ jobs:
         cmake -S . -B . ${{ matrix.arch.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: /WX /Wall ${{ matrix.std.value }}
+        CFLAGS: /WX ${{ matrix.std.value }}
 
     - name: Compile source code (cmake)
       run: cmake --build . --config Release -v
