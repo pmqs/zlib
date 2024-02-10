@@ -118,7 +118,7 @@ jobs:
         ./configure
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.compiler-opt }} -Werror
+        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.compiler-opt }} -Werror -Wall -Wextra
 
     - name: Compile source code (configure)
       if: matrix.builder == 'configure'
@@ -136,7 +136,7 @@ jobs:
         cmake -S . -B . -D CMAKE_BUILD_TYPE=Release -D ZLIB_BUILD_EXAMPLES=OFF  ${{ matrix.os.cmake-opt }}
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.compiler-opt }} -Werror
+        CFLAGS: -std=${{ matrix.std.value }} ${{ matrix.arch.compiler-opt }} -Werror -Wall -Wextra
 
     - name: Compile source code (cmake)
       if: matrix.builder == 'cmake'
@@ -199,7 +199,7 @@ jobs:
         cmake -S . -B . ${{ matrix.arch.value }} -D CMAKE_BUILD_TYPE=Release
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: /WX ${{ matrix.std.value }}
+        CFLAGS: /WX /Wall ${{ matrix.std.value }}
 
     - name: Compile source code (cmake)
       run: cmake --build . --config Release -v
