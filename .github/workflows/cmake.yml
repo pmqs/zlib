@@ -69,7 +69,7 @@ jobs:
       run: cmake -S ${{ matrix.src-dir || '.' }} -B ${{ matrix.build-dir || '.' }} ${{ matrix.cmake-args }} -D CMAKE_BUILD_TYPE=${{ matrix.build-config || 'Release' }}
       env:
         CC: ${{ matrix.compiler }}
-        CFLAGS: ${{ matrix.cflags }}
+        CFLAGS: ${{ matrix.cflags }} -Werror
 
     - name: Compile source code
       run: cmake --build ${{ matrix.build-dir || '.' }} --config ${{ matrix.build-config || 'Release' }}
