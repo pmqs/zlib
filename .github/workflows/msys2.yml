@@ -1,0 +1,63 @@
+name: MSYS2
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: msys2 {0}
+
+jobs:
+  configure:
+    name: ${{ matrix.sys }} CC=${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
+
+        sys:
+          - msys
+          - mingw64
+          - mingw32
+          - ucrt64
+          - clang64
+          - clang32
+
+        compiler:
+          - gcc
+          - clang
+
+    steps:
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{matrix.sys}}
+        install: make ${{ matrix.compiler }}
+
+    - name: Display uname
+      run: |
+        uname -a
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        show-progress: 'false'
+
+    - name: Generate project files (configure)
+      run: |
+        ./configure --warn
+      env:
+        CC: ${{ matrix.compiler }}
+
+    - name: Compile source code (configure)
+      run: make -j2
+
+    - name: Run test cases (configure)
+      run: |
+        make test
+        make cover
+
