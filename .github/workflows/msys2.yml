@@ -20,12 +20,12 @@ jobs:
           - windows-latest
 
         sys:
-          # - msys
+          - msys
           - mingw64
-          # - mingw32
-          # - ucrt64
-          # - clang64
-          # - clang32
+          - mingw32
+          - ucrt64
+          - clang64
+          - clang32
 
         compiler:
           - gcc
