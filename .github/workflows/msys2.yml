@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   configure:
-    name: ${{ matrix.sys }} CC=${{ matrix.compiler }}
+    name: ${{ matrix.sys }} CC=${{ matrix.compiler.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -28,9 +28,11 @@ jobs:
           - clang32
 
         compiler:
-          - gcc
-          - clang
-
+          - name: gcc
+            configure-opt: --warn --cover
+          - name: clang
+            configure-opt: --warn
+          
     steps:
 
     - uses: msys2/setup-msys2@v2
@@ -49,15 +51,16 @@ jobs:
 
     - name: Generate project files (configure)
       run: |
-        ./configure --warn --cover
+        ./configure ${{ matric.compiler.configure-opt }}
       env:
-        CC: ${{ matrix.compiler }}
+        CC: ${{ matrix.compiler.name }}
 
     - name: Compile source code (configure)
       run: make -j2
 
     - name: Run test cases (configure)
-      run: |
-        make test
-        make cover
+      run:  make test
 
+    - name: Run coverage test cases (configure)
+      if: matrix.compiler.name == 'gcc'
+      run: make cover
