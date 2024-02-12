@@ -51,7 +51,7 @@ jobs:
 
     - name: Generate project files (configure)
       run: |
-        ./configure ${{ matric.compiler.configure-opt }}
+        ./configure ${{ matrix.compiler.configure-opt }}
       env:
         CC: ${{ matrix.compiler.name }}
 
